@@ -1,16 +1,15 @@
-const API_URL = '/api/customer';
+const API_URL = '/api/products'
 
-export async function getCustomers() {
+export async function getProducts() {
     const res = await fetch(API_URL);
     return res.json();
-
 }
 
-export async function addCustomer(customer) {
+export async function addProduct(product) {
     const res = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(customer)
+        body: JSON.stringify(product)
     });
     return res.json();
 }
