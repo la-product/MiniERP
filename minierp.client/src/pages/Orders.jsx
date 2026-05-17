@@ -46,7 +46,7 @@ function Orders({ view, products, setProducts }) {
             setForm({ ...form, customerId: '', street: '', city: '', zip: '' });
         }
     };
-
+    
     const handleAddProduct = () => {
         if (!currentItem.brand) return;
         const product = products.find(
