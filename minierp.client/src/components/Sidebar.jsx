@@ -4,10 +4,10 @@ function Sidebar({ activePage, setActivePage }) {
     const [openSection, setOpenSection] = useState('');
 
     const menu = [
-        { label: 'Customers', items: ['Customer list', 'Add customer'] },
-        { label: 'Products', items: ['Product list', 'Add product'] },
-        { label: 'Orders', items: ['Order list', 'Add order'] },
-        { label: 'Invoices', items: ['Invoice list', 'Add invoice'] }
+        { label: 'Customers', icon: "bi bi-people", items: ['Customer list', 'Add customer'] },
+        { label: 'Products', icon: "bi bi-box", items: ['Product list', 'Add product'] },
+        { label: 'Orders', icon: "bi bi-cart",  items: ['Order list', 'Add order'] },
+        { label: 'Invoices', icon: "bi bi-receipt", items: ['Invoice list', 'Add invoice'] }
     ];
 
     return (
@@ -23,10 +23,19 @@ function Sidebar({ activePage, setActivePage }) {
                                 e.preventDefault();
                                 setOpenSection(openSection === section.label ? '' : section.label);
                             }}
-                            className="nav-link rounded text-dark d-flex justify-content-between"
+                            className="nav-link rounded text-dark d-flex justify-content-between sidebar-link"
                         >
-                            {section.label}
-                            <span>{openSection === section.label ? '▲' : '▼'}</span>
+                            <span>
+                                <i className={`${section.icon} me-2`}></i>
+                                {section.label}
+                            </span>
+                            <i
+                                className="bi bi-chevron-right"
+                                style={{
+                                    transition: 'transform 0.2s',
+                                    transform: openSection === section.label ? 'rotate(90deg)' : 'rotate(0deg)'
+                                }}
+                            ></i>
                         </a>
                         {openSection === section.label && (
                             <ul className="nav flex-column ps-3">
@@ -34,7 +43,7 @@ function Sidebar({ activePage, setActivePage }) {
                                     <li key={item} className="nav-item">
                                         <a href="#"
                                             onClick={(e) => { e.preventDefault(); setActivePage(item); }}
-                                            className={`nav-link rounded ${activePage === item ? 'bg-primary text-white' : 'text-secondary'}`}
+                                            className={`nav-link rounded ${activePage === item ? 'bg-secondary text-white' : 'text-secondary'}`}
                                         >
                                             {item}
                                         </a>

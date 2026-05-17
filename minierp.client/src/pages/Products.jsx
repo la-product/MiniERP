@@ -1,21 +1,10 @@
-import { useState, useEffect } from 'react';
-import { getProducts, addProduct } from '../services/productService';
+import { useState } from 'react';
+import { addProduct } from '../services/productService';
 
-
-function Products({ view }) {
-
-    const [products, setProducts] = useState([]);
-    const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' })
-    const [loading, setLoading] = useState(true);
+function Products({ view, products, setProducts, loading }) {
+    const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
-
-    useEffect(() => {
-        getProducts().then(data => {
-            setProducts(data);
-            setLoading(false);
-        });
-    }, []);
 
     const handleEdit = (product) => {
         setEditForm({ ...product });
@@ -28,16 +17,16 @@ function Products({ view }) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(editForm)
         });
-    setProducts(prev => prev.map(p => p.id === editForm.id ? editForm : p));
-    setShowModal(false);
-    }
+        setProducts(prev => prev.map(p => p.id === editForm.id ? editForm : p));
+        setShowModal(false);
+    };
 
-    function handleSubmit() {
+    const handleSubmit = () => {
         addProduct(form).then(newProduct => {
-            setProducts([...products, newProduct]);
+            setProducts(prev => [...prev, newProduct]);
             setForm({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
         });
-    }
+    };
 
 
 
