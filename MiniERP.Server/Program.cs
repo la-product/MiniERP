@@ -13,7 +13,7 @@ public class Program {
 
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
-                policy.WithOrigins("https://localhost:5173")
+                policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net/")
                       .AllowAnyHeader()
                       .AllowAnyMethod();
             });
@@ -31,7 +31,7 @@ public class Program {
         var app = builder.Build();
 
         app.UseDefaultFiles();
-        app.MapStaticAssets();
+        app.UseStaticFiles();
 
         if (app.Environment.IsDevelopment()) {
             app.MapOpenApi();
