@@ -12,18 +12,24 @@ function App() {
     const [productsLoading, setProductsLoading] = useState(true);
 
     useEffect(() => {
-        getProducts().then(data => {
-            setProducts(data);
-            setProductsLoading(false);
-        });
+        getProducts()
+            .then(data => {
+                setProducts(data);
+            })
+            .catch(() => {
+                setProducts([]);
+            })
+            .finally(() => {
+                setProductsLoading(false);
+            });
     }, []);
 
     const renderPage = () => {
         switch (activePage) {
             case 'Customer list': return <Customers view="list" />;
             case 'Add customer': return <Customers view="add" />;
-            case 'Product list': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} />;
-            case 'Add product': return <Products view="add" products={products} setProducts={setProducts} />;
+            case 'Product list': return <Products view="list" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} />;
+            case 'Add product': return <Products view="add" products={products} setProducts={setProducts} loading={productsLoading} setLoading={setProductsLoading} />;
             case 'Order list': return <Orders view="list" products={products} setProducts={setProducts} />;
             case 'Add order': return <Orders view="add" products={products} setProducts={setProducts} />;
             case 'Invoice list': return <Invoices view="list" />;

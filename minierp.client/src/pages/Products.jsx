@@ -1,41 +1,76 @@
-import { useState } from 'react';
-import { addProduct } from '../services/productService';
+import { useState, useEffect, useCallback } from 'react';
+import { getProducts, addProduct, updateProduct, deleteProduct } from '../services/productService';
+import { mapProductDtoToForm, getProductDisplayText } from '../mappers/productMapper';
 
-function Products({ view, products, setProducts, loading }) {
+function Products({ view, products, setProducts, loading, setLoading }) {
     const [form, setForm] = useState({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
     const [showModal, setShowModal] = useState(false);
     const [editForm, setEditForm] = useState({});
+    const [error, setError] = useState(null);
+
+    const loadProducts = useCallback(async () => {
+        try {
+            const data = await getProducts();
+            setProducts(data);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    }, [setLoading, setProducts]);
+
+    useEffect(() => {
+        if (!products) {
+            // eslint-disable-next-line react-hooks/set-state-in-effect
+            loadProducts();
+        }
+    }, [loadProducts, products]);
 
     const handleEdit = (product) => {
-        setEditForm({ ...product });
+        setEditForm(mapProductDtoToForm(product));
         setShowModal(true);
     };
 
     const handleUpdate = async () => {
-        await fetch(`/api/products/${editForm.id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(editForm)
-        });
-        setProducts(prev => prev.map(p => p.id === editForm.id ? editForm : p));
-        setShowModal(false);
+        try {
+            const updated = await updateProduct(editForm.id, editForm);
+            setProducts(prev => prev.map(p => p.id === editForm.id ? updated : p));
+            setShowModal(false);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
-    const handleSubmit = () => {
-        addProduct(form).then(newProduct => {
+    const handleDelete = async (id) => {
+        if (window.confirm('Opravdu chcete smazat tento produkt?')) {
+            try {
+                await deleteProduct(id);
+                setProducts(prev => prev.filter(p => p.id !== id));
+                setError(null);
+            } catch (err) {
+                setError(err.message);
+            }
+        }
+    };
+
+    const handleSubmit = async () => {
+        try {
+            const newProduct = await addProduct(form);
             setProducts(prev => [...prev, newProduct]);
             setForm({ size: '', brand: '', pattern: '', si: '', li: '', netPrice: '', stock: '' });
-        });
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        }
     };
-
-
-
-
 
     if (view == "add") {
         return (
             <div>
                 <h4 className="mb-4">Add Product</h4>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="card" style={{ maxWidth: 600 }}>
                     <div className="card-body">
                         <div className="row g-2">
@@ -76,6 +111,7 @@ function Products({ view, products, setProducts, loading }) {
             </div>
         );
     }
+
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center h-100">
@@ -85,8 +121,10 @@ function Products({ view, products, setProducts, loading }) {
             </div>
         );
     }
+
     return (
         <div>
+            {error && <div className="alert alert-danger">{error}</div>}
             {showModal && (
                 <div className="modal show d-block" style={{ backgroundColor: 'rgba(0,0,0,0.5)' }}>
                     <div className="modal-dialog">
@@ -99,94 +137,86 @@ function Products({ view, products, setProducts, loading }) {
                                 <div className="row g-2">
                                     <div className="col-md-6">
                                         <label className="form-label">Size</label>
-                                        <input className="form-control"
-                                            value={editForm.size || ''}
+                                        <input className="form-control" value={editForm.size || ''}
                                             onChange={e => setEditForm({ ...editForm, size: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Brand</label>
-                                        <input className="form-control"
-                                            value={editForm.brand || ''}
+                                        <label className="form-label">Brand</label>
+                                        <input className="form-control" value={editForm.brand || ''}
                                             onChange={e => setEditForm({ ...editForm, brand: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Pattern</label>
-                                        <input className="form-control"
-                                            value={editForm.pattern || ''}
+                                        <label className="form-label">Pattern</label>
+                                        <input className="form-control" value={editForm.pattern || ''}
                                             onChange={e => setEditForm({ ...editForm, pattern: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Si</label>
-                                        <input className="form-control"
-                                            value={editForm.si || ''}
+                                        <label className="form-label">Si</label>
+                                        <input className="form-control" value={editForm.si || ''}
                                             onChange={e => setEditForm({ ...editForm, si: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Li</label>
-                                        <input className="form-control"
-                                            value={editForm.li || ''}
+                                        <label className="form-label">Li</label>
+                                        <input className="form-control" value={editForm.li || ''}
                                             onChange={e => setEditForm({ ...editForm, li: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Net Price</label>
-                                        <input className="form-control"
-                                            value={editForm.netPrice || ''}
+                                        <label className="form-label">NetPrice</label>
+                                        <input className="form-control" value={editForm.netPrice || ''}
                                             onChange={e => setEditForm({ ...editForm, netPrice: e.target.value })} />
                                     </div>
                                     <div className="col-md-6">
-                                        <label className="form-label fw-bold">Stock</label>
-                                        <input className="form-control"
-                                            value={editForm.stock || ''}
+                                        <label className="form-label">Stock</label>
+                                        <input className="form-control" value={editForm.stock || ''}
                                             onChange={e => setEditForm({ ...editForm, stock: e.target.value })} />
                                     </div>
                                 </div>
                             </div>
                             <div className="modal-footer">
-                                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Cancel</button>
-                                <button className="btn btn-primary" onClick={handleUpdate}>Save changes</button>
+                                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                                    Close
+                                </button>
+                                <button className="btn btn-primary" onClick={handleUpdate}>
+                                    Update
+                                </button>
                             </div>
                         </div>
                     </div>
                 </div>
             )}
-            <h4>Products</h4>
-            <table className="table table-sm table-hover">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Size</th>
-                        <th>Brand</th>
-                        <th>Pattern</th>
-                        <th>SI</th>
-                        <th>LI</th>
-                        <th>NetPrice</th>
-                        <th>Stock</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
-                <tbody>{products.map(p =>
-                    <tr key={p.id}>
-                        <td>{p.id}</td>
-                        <td> {p.size}</td>
-                        <td>{p.brand}</td>
-                        <td>{p.pattern}</td>
-                        <td>{p.si}</td>
-                        <td>{p.li}</td>
-                        <td>{p.netPrice}</td>
-                        <td className="text-success fw-bold">{p.stock}</td>
-                        <td>
-
-                            <button className="btn btn-sm btn-warning" onClick={() => handleEdit(p)}>Edit</button>
-                        </td>
-
-                    </tr>
-                )}
-                </tbody>
-
-            </table>
+            <div className="table-responsive">
+                <table className="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Product</th>
+                            <th>NetPrice</th>
+                            <th>Stock</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {products && products.map(product => (
+                            <tr key={product.id}>
+                                <td>{getProductDisplayText(product)}</td>
+                                <td>{product.netPrice}</td>
+                                <td>{product.stock}</td>
+                                <td>
+                                    <button className="btn btn-sm btn-warning"
+                                        onClick={() => handleEdit(product)}>
+                                        Edit
+                                    </button>
+                                    <button className="btn btn-sm btn-danger ms-2"
+                                        onClick={() => handleDelete(product.id)}>
+                                        Delete
+                                    </button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </table>
+            </div>
         </div>
     );
 }
-
 
 export default Products;

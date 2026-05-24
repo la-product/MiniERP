@@ -1,9 +1,9 @@
-import { useState, useEffect } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { getCustomers } from "../services/customerService";
-import { getProducts } from "../services/productService";
-import { getOrders, createOrder, updateOrderStatus } from "../services/orderService";
+import { getOrders, createOrder, updateOrderStatus, deleteOrder } from "../services/orderService";
+import { getProductDisplayText } from "../mappers/productMapper";
 
-function Orders({ view, products, setProducts }) {
+function Orders({ view, products }) {
     const [customers, setCustomers] = useState([]);
     const [orders, setOrders] = useState([]);
     const [selectedOrder, setSelectedOrder] = useState(null);
@@ -14,17 +14,20 @@ function Orders({ view, products, setProducts }) {
         city: '',
         zip: '',
         shipping: 'courier',
-        payment: 'card'
+        payment: 'card',
+        note: ''
     });
     const [items, setItems] = useState([]);
     const [currentItem, setCurrentItem] = useState({
         brand: '',
         quantity: 1
     });
+    const [error, setError] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const changeStatusColor = (status) => {
         switch (status) {
-            case "New": return "bg-danger text-white";
+            case "new": return "bg-danger text-white";
             case "Processing": return "bg-warning text-dark";
             case "Shipped": return "bg-primary";
             case "Completed": return "bg-success";
@@ -32,10 +35,26 @@ function Orders({ view, products, setProducts }) {
         }
     };
 
-    useEffect(() => {
-        getCustomers().then(data => setCustomers(data));
-        getOrders().then(data => setOrders(data));
+    const loadData = useCallback(async () => {
+        try {
+            const [customersData, ordersData] = await Promise.all([
+                getCustomers(),
+                getOrders()
+            ]);
+            setCustomers(customersData);
+            setOrders(ordersData);
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
     }, []);
+
+    useEffect(() => {
+        // eslint-disable-next-line react-hooks/set-state-in-effect
+        loadData();
+    }, [loadData]);
 
     const handleCustomerInput = (e) => {
         const name = e.target.value;
@@ -46,16 +65,17 @@ function Orders({ view, products, setProducts }) {
             setForm({ ...form, customerId: '', street: '', city: '', zip: '' });
         }
     };
-    
+
     const handleAddProduct = () => {
         if (!currentItem.brand) return;
         const product = products.find(
-            p => `${p.size} ${p.brand} ${p.pattern}` === currentItem.brand
+            p => getProductDisplayText(p) === currentItem.brand
         );
         if (!product) return;
+
         const newItem = {
             productId: product.id,
-            brand: `${product.size} ${product.brand} ${product.pattern}`,
+            brand: getProductDisplayText(product),
             quantity: currentItem.quantity,
             unitPrice: product.netPrice,
             totalPrice: product.netPrice * currentItem.quantity
@@ -72,28 +92,32 @@ function Orders({ view, products, setProducts }) {
         if (!form.customerId) { alert("Select customer"); return; }
         if (items.length === 0) { alert("Add products"); return; }
 
-        const orderPayload = {
-            customerId: form.customerId,
-            shipping: `${form.street}, ${form.city}, ${form.zip}`,
-            payment: form.payment,
-            totalPrice: items.reduce((sum, item) => sum + item.totalPrice, 0),
-            status: "New",
-            items: items.map(i => ({
-                productId: i.productId,
-                quantity: i.quantity,
-                unitPrice: i.unitPrice
-            }))
-        };
-        console.log("orderPayload:", orderPayload);
+        try {
+            const orderPayload = {
+                customerId: form.customerId,
+                shipping: `${form.street}, ${form.city}, ${form.zip}`,
+                payment: form.payment,
+                totalPrice: items.reduce((sum, item) => sum + item.totalPrice, 0),
+                status: "new",
+                note: form.note,
+                items: items.map(i => ({
+                    productId: i.productId,
+                    quantity: i.quantity,
+                    unitPrice: i.unitPrice
+                }))
+            };
 
-        await createOrder(orderPayload);
+            await createOrder(orderPayload, items);
 
-        getOrders().then(data => setOrders(data));
-        getProducts().then(data => setProducts(data));
+            await loadData();
 
-        setItems([]);
-        setForm({ customerId: '', street: '', city: '', zip: '', shipping: 'courier', payment: 'card' });
-        setCurrentItem({ brand: '', quantity: 1 });
+            setItems([]);
+            setForm({ customerId: '', street: '', city: '', zip: '', shipping: 'courier', payment: 'card', note: '' });
+            setCurrentItem({ brand: '', quantity: 1 });
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     const handleOpenOrder = (order) => {
@@ -107,22 +131,38 @@ function Orders({ view, products, setProducts }) {
     };
 
     const handleChangeStatus = async () => {
-        const statuses = ["New", "Processing", "Shipped", "Completed"];
+        const statuses = ["new", "Processing", "Shipped", "Completed"];
         const currentIndex = statuses.indexOf(selectedOrder.status);
         if (currentIndex === -1 || currentIndex === statuses.length - 1) return;
 
-        const updatedStatus = statuses[currentIndex + 1];
+        try {
+            const updatedStatus = statuses[currentIndex + 1];
+            await updateOrderStatus(selectedOrder.id, updatedStatus);
+            await loadData();
+            setSelectedOrder({ ...selectedOrder, status: updatedStatus });
+            setError(null);
+        } catch (err) {
+            setError(err.message);
+        }
+    };
 
-        await updateOrderStatus(selectedOrder.id, updatedStatus);
-
-        getOrders().then(data => setOrders(data));
-        setSelectedOrder({ ...selectedOrder, status: updatedStatus });
+    const handleDeleteOrder = async (id) => {
+        if (window.confirm('Opravdu chcete smazat tuto objednávku?')) {
+            try {
+                await deleteOrder(id);
+                await loadData();
+                setError(null);
+            } catch (err) {
+                setError(err.message);
+            }
+        }
     };
 
     if (view === "add") {
         return (
             <div>
                 <h4 className="mb-4">New Order</h4>
+                {error && <div className="alert alert-danger">{error}</div>}
                 <div className="card" style={{ maxWidth: 700 }}>
                     <div className="card-body">
                         {/* Customer */}
@@ -204,8 +244,8 @@ function Orders({ view, products, setProducts }) {
                                     onChange={e => setCurrentItem({ ...currentItem, brand: e.target.value })}
                                 />
                                 <datalist id="product-list">
-                                    {products.map(p => (
-                                        <option key={p.id} value={`${p.size} ${p.brand} ${p.pattern}`} />
+                                    {products?.map(p => (
+                                        <option key={p.id} value={getProductDisplayText(p)} />
                                     ))}
                                 </datalist>
                             </div>
@@ -265,6 +305,8 @@ function Orders({ view, products, setProducts }) {
                                 className="form-control"
                                 rows={2}
                                 placeholder="Note (optional)"
+                                value={form.note}
+                                onChange={e => setForm({ ...form, note: e.target.value })}
                             />
                         </div>
                         <button
@@ -279,9 +321,20 @@ function Orders({ view, products, setProducts }) {
         );
     }
 
+    if (loading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center h-100">
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div>
             <h4 className="mb-4">List of Orders</h4>
+            {error && <div className="alert alert-danger">{error}</div>}
             <table className="table table-sm table-hover">
                 <thead>
                     <tr>
@@ -297,7 +350,7 @@ function Orders({ view, products, setProducts }) {
                     {orders.map(order => (
                         <tr key={order.id}>
                             <td>{order.id}</td>
-                            <td>{order.customer?.name ?? order.customerName}</td>
+                            <td>{order.customer?.name || 'Unknown'}</td>
                             <td>{new Date(order.createdAt).toLocaleString()}</td>
                             <td>{order.totalPrice.toFixed(2)} CZK</td>
                             <td>
@@ -311,6 +364,12 @@ function Orders({ view, products, setProducts }) {
                                     onClick={() => handleOpenOrder(order)}
                                 >
                                     Edit
+                                </button>
+                                <button
+                                    className="btn btn-sm btn-danger ms-2"
+                                    onClick={() => handleDeleteOrder(order.id)}
+                                >
+                                    Delete
                                 </button>
                             </td>
                         </tr>
@@ -347,7 +406,7 @@ function Orders({ view, products, setProducts }) {
                                     <tbody>
                                         {selectedOrder.items.map((item, index) => (
                                             <tr key={index}>
-                                                <td>{item.product?.brand ?? item.brand}</td>
+                                                <td>{item.product?.brand || 'Unknown'}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>{(item.unitPrice * item.quantity).toFixed(2)} CZK</td>
                                             </tr>

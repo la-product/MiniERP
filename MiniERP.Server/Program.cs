@@ -13,8 +13,7 @@ public class Program {
 
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
-                policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net/")
-                      .AllowAnyHeader()
+                policy.WithOrigins("https://localhost:5173", "https://myminierp.runasp.net/").AllowAnyHeader()
                       .AllowAnyMethod();
             });
         });
