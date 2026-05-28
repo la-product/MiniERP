@@ -1,4 +1,4 @@
-# MiniERP
+# ERPiE
 
 Webová aplikace pro správu zákazníků, produktů, objednávek a faktur. Projekt je aktuálně ve vývoji.
 
