@@ -3,7 +3,7 @@ import {
   mapFormToUpdateInvoiceDto,
 } from "../mappers/invoiceMapper.js";
 
-const API_URL = "/api/invoices";
+const API_URL = "/api/invoice";
 
 /**
  * Načte seznam všech faktur

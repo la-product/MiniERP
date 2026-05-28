@@ -184,11 +184,13 @@ function Products({ view, products, setProducts, loading, setLoading }) {
                     </div>
                 </div>
             )}
-            <div className="table-responsive">
-                <table className="table table-hover">
-                    <thead>
+            <h4>Product list</h4>
+            <div className="table-responsive rounded overflow-hidden">
+                <table className="table table-hover table-sm table-striped table-light mb-0">
+                    <thead className="table-secondary">
                         <tr>
-                            <th>Product</th>
+                            <th>Size</th>
+                            <th>SI/LI</th>
                             <th>NetPrice</th>
                             <th>Stock</th>
                             <th>Actions</th>
@@ -198,8 +200,9 @@ function Products({ view, products, setProducts, loading, setLoading }) {
                         {products && products.map(product => (
                             <tr key={product.id}>
                                 <td>{getProductDisplayText(product)}</td>
-                                <td>{product.netPrice}</td>
-                                <td>{product.stock}</td>
+                                <td>{product.si}{product.li}</td>
+                                <td className="fw-bold">{product.netPrice}</td>
+                                <td className="text-success fw-bold">{product.stock}</td>
                                 <td>
                                     <button className="btn btn-sm btn-warning"
                                         onClick={() => handleEdit(product)}>

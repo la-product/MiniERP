@@ -3,7 +3,7 @@ import {
   mapFormToUpdateOrderDto,
 } from "../mappers/orderMapper.js";
 
-const API_URL = "/api/orders";
+const API_URL = "/api/order";
 
 /**
  * Načte seznam všech objednávek

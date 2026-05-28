@@ -261,10 +261,10 @@ function Customers({ view }) {
                     </div>
                 </div>
             )}
-
-            <div className="table-responsive">
-                <table className="table table-hover">
-                    <thead>
+            <h4>Customer List</h4>
+            <div className="table-responsive rounded overflow-hidden">
+                <table className="table table-hover table-sm table-striped table-light mb-0">
+                    <thead className="table-secondary">
                         <tr>
                             <th>Name</th>
                             <th>Email</th>

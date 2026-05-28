@@ -8,10 +8,10 @@ namespace MiniERP.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class InvoicesController : ControllerBase {
+public class InvoiceController : ControllerBase {
     private readonly AppDbContext _context;
 
-    public InvoicesController(AppDbContext context) {
+    public InvoiceController(AppDbContext context) {
         _context = context;
     }
 

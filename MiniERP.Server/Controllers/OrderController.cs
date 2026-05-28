@@ -8,10 +8,10 @@ namespace MiniERP.Server.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class OrdersController : ControllerBase {
+public class OrderController : ControllerBase {
     private readonly AppDbContext _context;
 
-    public OrdersController(AppDbContext context) {
+    public OrderController(AppDbContext context) {
         _context = context;
     }
 
@@ -32,7 +32,11 @@ public class OrdersController : ControllerBase {
             CreatedAt = o.CreatedAt,
             TotalPrice = o.TotalPrice,
             Note = o.Note,
-            Status = o.Status
+            Status = o.Status,
+            Customer = new CustomerDTO {
+                Id = o.Customer.Id,
+                Name = o.Customer.Name,
+            }
         }).ToList();
 
         return Ok(dtos);

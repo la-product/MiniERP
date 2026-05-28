@@ -40,7 +40,9 @@ function App() {
 
     return (
         <Layout activePage={activePage} setActivePage={setActivePage}>
-            {renderPage()}
+            <div className="animate-slide-in">
+                {renderPage()}
+            </div>
         </Layout>
     );
 }

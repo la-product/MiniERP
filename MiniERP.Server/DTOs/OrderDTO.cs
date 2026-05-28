@@ -10,6 +10,7 @@ public class OrderDTO
     public double TotalPrice { get; set; }
     public string? Note { get; set; }
     public string Status { get; set; } = string.Empty;
+    public CustomerDTO? Customer { get; set; }
 }
 
 public class CreateOrderDTO

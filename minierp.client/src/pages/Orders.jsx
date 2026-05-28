@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { getCustomers } from "../services/customerService";
-import { getOrders, createOrder, updateOrderStatus, deleteOrder } from "../services/orderService";
+import { getOrders, createOrder, updateOrderStatus, deleteOrder, getOrderById } from "../services/orderService";
 import { getProductDisplayText } from "../mappers/productMapper";
 
 function Orders({ view, products }) {
@@ -23,14 +23,12 @@ function Orders({ view, products }) {
         quantity: 1
     });
     const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     const changeStatusColor = (status) => {
         switch (status) {
             case "new": return "bg-danger text-white";
-            case "Processing": return "bg-warning text-dark";
-            case "Shipped": return "bg-primary";
-            case "Completed": return "bg-success";
+            case "completed": return "bg-success";
             default: return "bg-secondary";
         }
     };
@@ -52,7 +50,6 @@ function Orders({ view, products }) {
     }, []);
 
     useEffect(() => {
-        // eslint-disable-next-line react-hooks/set-state-in-effect
         loadData();
     }, [loadData]);
 
@@ -120,9 +117,14 @@ function Orders({ view, products }) {
         }
     };
 
-    const handleOpenOrder = (order) => {
-        setSelectedOrder(order);
-        setShowModal(true);
+    const handleOpenOrder = async (order) => {
+        try {
+            const detail = await getOrderById(order.id);
+            setSelectedOrder(detail);
+            setShowModal(true);
+        } catch (err) {
+            setError(err.message);
+        }
     };
 
     const handleCloseModal = () => {
@@ -335,8 +337,9 @@ function Orders({ view, products }) {
         <div>
             <h4 className="mb-4">List of Orders</h4>
             {error && <div className="alert alert-danger">{error}</div>}
-            <table className="table table-sm table-hover">
-                <thead>
+            <div className="table-responsive rounded overflow-hidden">
+            <table className="table table-hover table-sm table-striped table-light mb-0">
+                <thead className="table-secondary">
                     <tr>
                         <th>Order ID</th>
                         <th>Customer</th>
@@ -375,7 +378,8 @@ function Orders({ view, products }) {
                         </tr>
                     ))}
                 </tbody>
-            </table>
+                </table>
+            </div>
             {/* Modal okno */}
             {showModal && selectedOrder && (
                 <div
@@ -399,6 +403,7 @@ function Orders({ view, products }) {
                                     <thead>
                                         <tr>
                                             <th>Product</th>
+                                            <th>Pattern</th>
                                             <th>Qty</th>
                                             <th>Price</th>
                                         </tr>
@@ -406,7 +411,8 @@ function Orders({ view, products }) {
                                     <tbody>
                                         {selectedOrder.items.map((item, index) => (
                                             <tr key={index}>
-                                                <td>{item.product?.brand || 'Unknown'}</td>
+                                                <td>{item.product?.size || 'Unknown'} {item.product?.brand || 'Unknown'} </td>
+                                                <td>{item.product?.pattern || 'Unknown'}</td>
                                                 <td>{item.quantity}</td>
                                                 <td>{(item.unitPrice * item.quantity).toFixed(2)} CZK</td>
                                             </tr>
