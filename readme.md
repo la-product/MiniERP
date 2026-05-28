@@ -31,10 +31,10 @@ Webová aplikace pro správu zákazníků, produktů, objednávek a faktur. Proj
 - [x] Vytvoření objednávky (výběr zákazníka, produktů, dopravy a platby)
 - [x] Automatické odečtení skladu po vytvoření objednávky
 - [x] Změna stavu objednávky (New → Processing → Shipped → Completed)
-- [ ] Synchronizace s databází (v řešení)
+- [x] Synchronizace s databází (v řešení)
 
 ### Faktury
-- [ ] Seznam faktur
+- [x] Seznam faktur
 - [ ] Vytvoření faktury z objednávky
 
 ## Struktura projektu
@@ -115,4 +115,4 @@ Frontend běží na `https://localhost:65218`.
 
 ## Stav projektu
 
-Projekt je aktivně vyvíjen. Aktuálně se pracuje na synchronizaci objednávek s databází a propojení skladu s objednávkovým systémem.
+Projekt je aktivně vyvíjen. Aktuálně se pracuje na synchronizaci objednávek s fakturami.
