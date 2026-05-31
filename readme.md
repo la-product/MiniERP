@@ -119,10 +119,6 @@ Frontend běží na `http://localhost:5173`.
 | GET | `/api/invoices` | Seznam faktur |
 | GET | `/api/auth/users` | Seznam uživatelů |
 
-## Přihlašovací údaje (Demo)
-
-- **Uživatel:** `admin`
-- **Heslo:** `adminpassword`
 
 ## Stav projektu
 
