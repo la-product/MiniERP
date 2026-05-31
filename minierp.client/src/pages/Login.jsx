@@ -78,7 +78,7 @@ function Login({ onLogin }) {
                             />
                         </div>
                     </div>
-                    <button type="submit" className="btn btn-primary w-100 py-2 fw-bold" style={{ backgroundColor: '#0d6efd', border: 'none' }} disabled={loading}>
+                    <button type="submit" className="btn btn-primary w-100 py-2 fw-bold" disabled={loading}>
                         {loading ? (
                             <>
                                 <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>

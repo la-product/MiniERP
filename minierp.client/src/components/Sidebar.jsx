@@ -33,19 +33,23 @@ function Sidebar({ activePage, setActivePage, user }) {
       className="bg-white border-end d-flex flex-column"
       style={{ width: 260, boxShadow: "2px 0 8px rgba(0,0,0,0.05)" }}
     >
-      <div className="p-4 border-bottom">
+      <div className="p-4 border-bottom d-flex align-items-center justify-content-center">
+        <i className="bi bi-box-seam me-2" style={{ fontSize: '24px', color: 'var(--primary)' }}></i>
+        <h5 className="fw-bold mb-0" style={{ letterSpacing: '-0.03em', color: 'var(--text)' }}>ERPiE</h5>
+      </div>
+      <div className="px-3 py-4">
         <h6
-          className="text-uppercase text-muted mb-0"
+          className="text-uppercase text-muted mb-3 px-3"
           style={{
             fontSize: "11px",
             fontWeight: "700",
-            letterSpacing: "0.5px",
+            letterSpacing: "0.1em",
           }}
         >
-          <i className="bi bi-list me-2"></i>Navigace
+          Menu
         </h6>
       </div>
-      <ul className="nav flex-column px-3 py-2">
+      <ul className="nav flex-column px-3">
         {menu.map((section) => (
           <li key={section.label} className="nav-item mb-1">
             <a
@@ -56,35 +60,37 @@ function Sidebar({ activePage, setActivePage, user }) {
                   openSection === section.label ? "" : section.label,
                 );
               }}
-              className="nav-link rounded-2 text-dark d-flex justify-content-between align-items-center py-2 px-3"
+              className="nav-link rounded-3 text-dark d-flex justify-content-between align-items-center py-2 px-3"
               style={{
-                transition: "all 0.2s ease",
+                transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
                 backgroundColor:
-                  openSection === section.label ? "#e7f1ff" : "transparent",
-                color: openSection === section.label ? "#0d6efd" : "#333",
+                  openSection === section.label ? "var(--primary-light)" : "transparent",
+                color: openSection === section.label ? "var(--primary)" : "var(--text)",
+                fontWeight: openSection === section.label ? "600" : "500",
               }}
             >
               <span>
                 <i
                   className={`${section.icon} me-3`}
-                  style={{ fontSize: "18px" }}
+                  style={{ fontSize: "18px", opacity: openSection === section.label ? 1 : 0.7 }}
                 ></i>
-                <strong>{section.label}</strong>
+                {section.label}
               </span>
               <i
                 className="bi bi-chevron-right"
                 style={{
-                  transition: "transform 0.2s",
+                  transition: "transform 0.3s",
                   transform:
                     openSection === section.label
                       ? "rotate(90deg)"
                       : "rotate(0deg)",
-                  fontSize: "16px",
+                  fontSize: "12px",
+                  opacity: 0.5
                 }}
               ></i>
             </a>
             {openSection === section.label && (
-              <ul className="nav flex-column ps-4 mt-1">
+              <ul className="nav flex-column ps-3 mt-1 ms-3 border-start">
                 {section.items.map((item) => (
                   <li key={item} className="nav-item">
                     <a
@@ -93,19 +99,17 @@ function Sidebar({ activePage, setActivePage, user }) {
                         e.preventDefault();
                         setActivePage(item);
                       }}
-                      className="nav-link rounded-2 py-2 px-3"
+                      className="nav-link rounded-3 py-2 px-3"
                       style={{
                         backgroundColor:
-                          activePage === item ? "#7caffc" : "transparent",
-                        color: activePage === item ? "white" : "#666",
+                          activePage === item ? "transparent" : "transparent",
+                        border: activePage === item ? "1px solid var(--primary)" : "1px solid transparent",
+                        color: activePage === item ? "var(--primary)" : "var(--text-muted)",
                         transition: "all 0.2s ease",
-                        fontSize: "14px",
+                        fontSize: "13.5px",
+                        fontWeight: activePage === item ? "600" : "400",
                       }}
                     >
-                      <i
-                        className="bi bi-chevron-right me-2"
-                        style={{ fontSize: "14px" }}
-                      ></i>
                       {item}
                     </a>
                   </li>

@@ -92,44 +92,75 @@ function Customers({ view }) {
     if (view === "add") {
         return (
             <div>
-                <h4 className="mb-4">Add Customer</h4>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h4 className="fw-bold mb-0">Add Customer</h4>
+                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/customers")}>
+                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                    </button>
+                </div>
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="card" style={{ maxWidth: 600 }}>
-                    <div className="card-body">
-                        <div className="row g-2">
+                <div className="card border-0 shadow-sm" style={{ maxWidth: 800 }}>
+                    <div className="card-body p-4">
+                        <div className="row g-3">
                             <div className="col-md-6">
-                                <input
-                                    className="form-control"
-                                    placeholder="Name"
-                                    value={form.name}
-                                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                                />
+                                <label className="form-label small fw-bold text-uppercase text-muted">Customer Name</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-person text-muted"></i></span>
+                                    <input
+                                        className="form-control"
+                                        placeholder="Full Name"
+                                        value={form.name}
+                                        onChange={(e) => setForm({ ...form, name: e.target.value })}
+                                    />
+                                </div>
                             </div>
                             <div className="col-md-6">
-                                <input
-                                    className="form-control"
-                                    placeholder="Email"
-                                    value={form.email}
-                                    onChange={(e) => setForm({ ...form, email: e.target.value })}
-                                />
+                                <label className="form-label small fw-bold text-uppercase text-muted">Email Address</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-envelope text-muted"></i></span>
+                                    <input
+                                        className="form-control"
+                                        placeholder="email@example.com"
+                                        value={form.email}
+                                        onChange={(e) => setForm({ ...form, email: e.target.value })}
+                                    />
+                                </div>
                             </div>
                             <div className="col-md-6">
-                                <input
-                                    className="form-control"
-                                    placeholder="Phone"
-                                    value={form.phone}
-                                    onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                                />
+                                <label className="form-label small fw-bold text-uppercase text-muted">Phone Number</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-telephone text-muted"></i></span>
+                                    <input
+                                        className="form-control"
+                                        placeholder="+420 ..."
+                                        value={form.phone}
+                                        onChange={(e) => setForm({ ...form, phone: e.target.value })}
+                                    />
+                                </div>
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-12 mt-4">
+                                <h6 className="fw-bold mb-3 border-bottom pb-2">Address Details</h6>
+                            </div>
+                            <div className="col-md-8">
+                                <label className="form-label small fw-bold text-uppercase text-muted">Street</label>
                                 <input
                                     className="form-control"
-                                    placeholder="Address"
+                                    placeholder="Street and house number"
                                     value={form.street}
                                     onChange={(e) => setForm({ ...form, street: e.target.value })}
                                 />
                             </div>
-                            <div className="col-md-6">
+                            <div className="col-md-4">
+                                <label className="form-label small fw-bold text-uppercase text-muted">ZIP Code</label>
+                                <input
+                                    className="form-control"
+                                    placeholder="123 45"
+                                    value={form.zip}
+                                    onChange={(e) => setForm({ ...form, zip: e.target.value })}
+                                />
+                            </div>
+                            <div className="col-md-12">
+                                <label className="form-label small fw-bold text-uppercase text-muted">City</label>
                                 <input
                                     className="form-control"
                                     placeholder="City"
@@ -137,18 +168,12 @@ function Customers({ view }) {
                                     onChange={(e) => setForm({ ...form, city: e.target.value })}
                                 />
                             </div>
-                            <div className="col-md-6">
-                                <input
-                                    className="form-control"
-                                    placeholder="ZIP Code"
-                                    value={form.zip}
-                                    onChange={(e) => setForm({ ...form, zip: e.target.value })}
-                                />
-                            </div>
                         </div>
-                        <button className="btn btn-primary mt-3" onClick={handleSubmit}>
-                            Add Customer
-                        </button>
+                        <div className="mt-4 pt-3 border-top">
+                            <button className="btn btn-primary btn-lg w-100 fw-bold" onClick={handleSubmit}>
+                                <i className="bi bi-person-plus me-2"></i>Create Customer
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -158,7 +183,7 @@ function Customers({ view }) {
     if (loading) {
         return (
             <div className="d-flex justify-content-center align-items-center h-100">
-                <div className="spinner-border text-primary" role="status">
+                <div className="spinner-border text-primary" role="status" style={{ color: 'var(--primary) !important' }}>
                     <span className="visually-hidden">Loading...</span>
                 </div>
             </div>
@@ -261,43 +286,53 @@ function Customers({ view }) {
                     </div>
                 </div>
             )}
-            <h4>Customer List</h4>
-            <div className="table-responsive rounded overflow-hidden">
-                <table className="table table-hover table-sm table-striped table-light mb-0">
-                    <thead className="table-secondary">
-                        <tr>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>City</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {customers.map((customer) => (
-                            <tr key={customer.id}>
-                                <td>{customer.name}</td>
-                                <td>{customer.email}</td>
-                                <td>{customer.phone}</td>
-                                <td>{customer.city}</td>
-                                <td>
-                                    <button
-                                        className="btn btn-sm btn-warning"
-                                        onClick={() => handleEdit(customer)}
-                                    >
-                                        Edit
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-danger ms-2"
-                                        onClick={() => handleDelete(customer.id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="fw-bold mb-0">Customer List</h4>
+                <button className="btn btn-primary" onClick={() => window.location.hash = '#/customers/add'}>
+                    <i className="bi bi-plus-lg me-2"></i>New Customer
+                </button>
+            </div>
+            <div className="card border-0 shadow-sm overflow-hidden">
+                <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Name</th>
+                                <th>Contact Information</th>
+                                <th>Location</th>
+                                <th className="text-end">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {customers.map((customer) => (
+                                <tr key={customer.id}>
+                                    <td className="fw-bold">{customer.name}</td>
+                                    <td>
+                                        <div className="d-flex flex-column">
+                                            <span className="text-dark">{customer.email}</span>
+                                            <span className="text-muted small">{customer.phone}</span>
+                                        </div>
+                                    </td>
+                                    <td>{customer.city}</td>
+                                    <td className="text-end">
+                                        <button
+                                            className="btn btn-sm btn-outline-primary me-2"
+                                            onClick={() => handleEdit(customer)}
+                                        >
+                                            <i className="bi bi-pencil"></i>
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-outline-danger"
+                                            onClick={() => handleDelete(customer.id)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

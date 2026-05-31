@@ -69,43 +69,66 @@ function Products({ view, products, setProducts, loading, setLoading }) {
     if (view == "add") {
         return (
             <div>
-                <h4 className="mb-4">Add Product</h4>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h4 className="fw-bold mb-0">Add Product</h4>
+                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/products")}>
+                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                    </button>
+                </div>
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="card" style={{ maxWidth: 600 }}>
-                    <div className="card-body">
-                        <div className="row g-2">
+                <div className="card border-0 shadow-sm" style={{ maxWidth: 800 }}>
+                    <div className="card-body p-4">
+                        <div className="row g-3">
                             <div className="col-md-6">
-                                <input className="form-control" placeholder="Size"
+                                <label className="form-label small fw-bold text-uppercase text-muted">Brand / Manufacturer</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-tag text-muted"></i></span>
+                                    <input className="form-control" placeholder="e.g. Michelin"
+                                        value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} />
+                                </div>
+                            </div>
+                            <div className="col-md-6">
+                                <label className="form-label small fw-bold text-uppercase text-muted">Product Size</label>
+                                <input className="form-control" placeholder="e.g. 205/55 R16"
                                     value={form.size} onChange={e => setForm({ ...form, size: e.target.value })} />
                             </div>
                             <div className="col-md-6">
-                                <input className="form-control" placeholder="Brand"
-                                    value={form.brand} onChange={e => setForm({ ...form, brand: e.target.value })} />
-                            </div>
-                            <div className="col-md-6">
-                                <input className="form-control" placeholder="Pattern"
+                                <label className="form-label small fw-bold text-uppercase text-muted">Pattern</label>
+                                <input className="form-control" placeholder="e.g. Alpin 6"
                                     value={form.pattern} onChange={e => setForm({ ...form, pattern: e.target.value })} />
                             </div>
-                            <div className="col-md-6">
-                                <input className="form-control" placeholder="Si"
+                            <div className="col-md-3">
+                                <label className="form-label small fw-bold text-uppercase text-muted">SI (Speed Index)</label>
+                                <input className="form-control" placeholder="V"
                                     value={form.si} onChange={e => setForm({ ...form, si: e.target.value })} />
                             </div>
-                            <div className="col-md-6">
-                                <input className="form-control" placeholder="Li"
+                            <div className="col-md-3">
+                                <label className="form-label small fw-bold text-uppercase text-muted">LI (Load Index)</label>
+                                <input className="form-control" placeholder="91"
                                     value={form.li} onChange={e => setForm({ ...form, li: e.target.value })} />
                             </div>
                             <div className="col-md-6">
-                                <input className="form-control" placeholder="NetPrice"
-                                    value={form.netPrice} onChange={e => setForm({ ...form, netPrice: e.target.value })} />
+                                <label className="form-label small fw-bold text-uppercase text-muted">Net Price ({new Intl.NumberFormat('cs-CZ', { style: 'currency', currency: 'CZK' }).format(0).replace(/\d|,|.\d/g, '').trim()})</label>
+                                <div className="input-group">
+                                    <input className="form-control" type="number" placeholder="0.00"
+                                        value={form.netPrice} onChange={e => setForm({ ...form, netPrice: e.target.value })} />
+                                    <span className="input-group-text bg-light">CZK</span>
+                                </div>
                             </div>
                             <div className="col-md-6">
-                                <input className="form-control" placeholder="Stock"
-                                    value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
+                                <label className="form-label small fw-bold text-uppercase text-muted">Stock Quantity</label>
+                                <div className="input-group">
+                                    <span className="input-group-text bg-white"><i className="bi bi-box text-muted"></i></span>
+                                    <input className="form-control" type="number" placeholder="0"
+                                        value={form.stock} onChange={e => setForm({ ...form, stock: e.target.value })} />
+                                </div>
                             </div>
                         </div>
-                        <button className="btn btn-primary mt-3" onClick={handleSubmit}>
-                            Add Product
-                        </button>
+                        <div className="mt-4 pt-3 border-top">
+                            <button className="btn btn-primary btn-lg w-100 fw-bold" onClick={handleSubmit}>
+                                <i className="bi bi-plus-circle me-2"></i>Create Product
+                            </button>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -184,39 +207,57 @@ function Products({ view, products, setProducts, loading, setLoading }) {
                     </div>
                 </div>
             )}
-            <h4>Product list</h4>
-            <div className="table-responsive rounded overflow-hidden">
-                <table className="table table-hover table-sm table-striped table-light mb-0">
-                    <thead className="table-secondary">
-                        <tr>
-                            <th>Size</th>
-                            <th>SI/LI</th>
-                            <th>NetPrice</th>
-                            <th>Stock</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {products && products.map(product => (
-                            <tr key={product.id}>
-                                <td>{getProductDisplayText(product)}</td>
-                                <td>{product.si}{product.li}</td>
-                                <td className="fw-bold">{product.netPrice}</td>
-                                <td className="text-success fw-bold">{product.stock}</td>
-                                <td>
-                                    <button className="btn btn-sm btn-warning"
-                                        onClick={() => handleEdit(product)}>
-                                        Edit
-                                    </button>
-                                    <button className="btn btn-sm btn-danger ms-2"
-                                        onClick={() => handleDelete(product.id)}>
-                                        Delete
-                                    </button>
-                                </td>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="fw-bold mb-0">Product List</h4>
+                <button className="btn btn-primary" onClick={() => window.location.hash = '#/products/add'}>
+                    <i className="bi bi-plus-lg me-2"></i>New Product
+                </button>
+            </div>
+            <div className="card border-0 shadow-sm overflow-hidden">
+                <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Product Details</th>
+                                <th>SI/LI</th>
+                                <th>Price</th>
+                                <th>Stock</th>
+                                <th className="text-end">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {products && products.map(product => (
+                                <tr key={product.id}>
+                                    <td>
+                                        <div className="fw-bold text-dark">{product.brand} {product.pattern}</div>
+                                        <div className="text-muted small">{product.size}</div>
+                                    </td>
+                                    <td>
+                                        <span className="badge bg-light text-dark border fw-medium">
+                                            {product.si}{product.li}
+                                        </span>
+                                    </td>
+                                    <td className="fw-bold text-dark">{product.netPrice} CZK</td>
+                                    <td>
+                                        <span className={`badge ${product.stock > 10 ? 'bg-success-light text-success' : 'bg-warning-light text-warning'}`}>
+                                            {product.stock} pcs
+                                        </span>
+                                    </td>
+                                    <td className="text-end">
+                                        <button className="btn btn-sm btn-outline-primary me-2"
+                                            onClick={() => handleEdit(product)}>
+                                            <i className="bi bi-pencil"></i>
+                                        </button>
+                                        <button className="btn btn-sm btn-outline-danger"
+                                            onClick={() => handleDelete(product.id)}>
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     );

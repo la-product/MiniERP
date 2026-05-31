@@ -69,16 +69,16 @@ function Invoices({ view }) {
         totalPrice: 0,
     });
 
-    const changeStatusColor = (status) => {
+    const getStatusBadgeClass = (status) => {
         switch (status) {
             case "draft":
-                return "bg-secondary text-white";
+                return "badge-secondary-light";
             case "issued":
-                return "bg-info text-white";
+                return "badge-primary-light";
             case "paid":
-                return "bg-success text-white";
+                return "badge-success-light";
             case "overdue":
-                return "bg-danger text-white";
+                return "badge-danger-light";
             default:
                 return "bg-secondary";
         }
@@ -240,13 +240,18 @@ function Invoices({ view }) {
     if (view === "add") {
         return (
             <div>
-                <h4 className="mb-4">Create Invoice</h4>
+                <div className="d-flex justify-content-between align-items-center mb-4">
+                    <h4 className="fw-bold mb-0">Create Invoice</h4>
+                    <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/invoices")}>
+                        <i className="bi bi-arrow-left me-2"></i>Back to List
+                    </button>
+                </div>
                 {error && <div className="alert alert-danger">{error}</div>}
-                <div className="card" style={{ maxWidth: 800 }}>
-                    <div className="card-body">
-                        <div className="row g-3 mb-3">
+                <div className="card border-0 shadow-sm" style={{ maxWidth: 900 }}>
+                    <div className="card-body p-4">
+                        <div className="row g-3 mb-4">
                             <div className="col-md-3">
-                                <label className="form-label">Issue Date</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Issue Date</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -257,7 +262,7 @@ function Invoices({ view }) {
                                 />
                             </div>
                             <div className="col-md-3">
-                                <label className="form-label">Due Date</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Due Date</label>
                                 <input
                                     type="date"
                                     className="form-control"
@@ -268,7 +273,7 @@ function Invoices({ view }) {
                                 />
                             </div>
                             <div className="col-md-3">
-                                <label className="form-label">Currency</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Currency</label>
                                 <select
                                     className="form-select"
                                     value={form.currencyCode}
@@ -282,7 +287,7 @@ function Invoices({ view }) {
                                 </select>
                             </div>
                             <div className="col-md-3">
-                                <label className="form-label">Status</label>
+                                <label className="form-label small fw-bold text-uppercase text-muted">Status</label>
                                 <select
                                     className="form-select"
                                     value={form.status}
@@ -295,8 +300,8 @@ function Invoices({ view }) {
                             </div>
                         </div>
 
-                        <h6 className="text-muted mb-2">Customer</h6>
-                        <div className="mb-3">
+                        <div className="mb-4">
+                            <label className="form-label small fw-bold text-uppercase text-muted">Customer</label>
                             <select
                                 className="form-select"
                                 value={form.customerId}
@@ -311,141 +316,155 @@ function Invoices({ view }) {
                             </select>
                         </div>
 
-                        <h6 className="text-muted mb-2">Items</h6>
-                        <div className="row g-2 mb-2">
-                            <div className="col-md-3">
-                                <select
-                                    className="form-select form-select-sm"
-                                    value={currentItem.productId}
-                                    onChange={(e) => {
-                                        const product = products.find(
-                                            (p) => p.id === parseInt(e.target.value),
-                                        );
-                                        setCurrentItem({
-                                            ...currentItem,
-                                            productId: e.target.value,
-                                            unitPrice: product?.netPrice || 0,
-                                        });
-                                    }}
-                                >
-                                    <option value="">— Product —</option>
-                                    {products.map((p) => (
-                                        <option key={p.id} value={p.id}>
-                                            {getProductDisplayText(p)}
-                                        </option>
-                                    ))}
-                                </select>
+                        <div className="border-top pt-4">
+                            <h6 className="fw-bold mb-3">Invoice Items</h6>
+                            <div className="row g-2 mb-3 align-items-end">
+                                <div className="col-md-3">
+                                    <label className="form-label small">Product</label>
+                                    <select
+                                        className="form-select"
+                                        value={currentItem.productId}
+                                        onChange={(e) => {
+                                            const product = products.find(
+                                                (p) => p.id === parseInt(e.target.value),
+                                            );
+                                            setCurrentItem({
+                                                ...currentItem,
+                                                productId: e.target.value,
+                                                unitPrice: product?.netPrice || 0,
+                                            });
+                                        }}
+                                    >
+                                        <option value="">— Product —</option>
+                                        {products.map((p) => (
+                                            <option key={p.id} value={p.id}>
+                                                {getProductDisplayText(p)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="col-md-3">
+                                    <label className="form-label small">Description</label>
+                                    <input
+                                        type="text"
+                                        className="form-control"
+                                        placeholder="Description"
+                                        value={currentItem.description}
+                                        onChange={(e) =>
+                                            setCurrentItem({
+                                                ...currentItem,
+                                                description: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="col-md-2">
+                                    <label className="form-label small">Qty</label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Qty"
+                                        value={currentItem.quantity}
+                                        onChange={(e) =>
+                                            setCurrentItem({ ...currentItem, quantity: e.target.value })
+                                        }
+                                    />
+                                </div>
+                                <div className="col-md-2">
+                                    <label className="form-label small">Unit Price</label>
+                                    <input
+                                        type="number"
+                                        className="form-control"
+                                        placeholder="Price"
+                                        value={currentItem.unitPrice}
+                                        onChange={(e) =>
+                                            setCurrentItem({
+                                                ...currentItem,
+                                                unitPrice: e.target.value,
+                                            })
+                                        }
+                                    />
+                                </div>
+                                <div className="col-md-2">
+                                    <button
+                                        className="btn btn-outline-primary w-100"
+                                        onClick={handleAddItem}
+                                    >
+                                        <i className="bi bi-plus-lg me-1"></i>Add
+                                    </button>
+                                </div>
                             </div>
-                            <div className="col-md-3">
-                                <input
-                                    type="text"
-                                    className="form-control form-control-sm"
-                                    placeholder="Description"
-                                    value={currentItem.description}
-                                    onChange={(e) =>
-                                        setCurrentItem({
-                                            ...currentItem,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div className="col-md-2">
-                                <input
-                                    type="number"
-                                    className="form-control form-control-sm"
-                                    placeholder="Qty"
-                                    value={currentItem.quantity}
-                                    onChange={(e) =>
-                                        setCurrentItem({ ...currentItem, quantity: e.target.value })
-                                    }
-                                />
-                            </div>
-                            <div className="col-md-2">
-                                <input
-                                    type="number"
-                                    className="form-control form-control-sm"
-                                    placeholder="Price"
-                                    value={currentItem.unitPrice}
-                                    onChange={(e) =>
-                                        setCurrentItem({
-                                            ...currentItem,
-                                            unitPrice: e.target.value,
-                                        })
-                                    }
-                                />
-                            </div>
-                            <div className="col-md-2">
-                                <button
-                                    className="btn btn-sm btn-outline-primary w-100"
-                                    onClick={handleAddItem}
-                                >
-                                    Add
-                                </button>
+
+                            {items.length > 0 && (
+                                <div className="table-responsive">
+                                    <table className="table table-hover align-middle">
+                                        <thead className="table-light">
+                                            <tr>
+                                                <th>Product</th>
+                                                <th>Description</th>
+                                                <th className="text-center">Qty</th>
+                                                <th className="text-end">Unit Price</th>
+                                                <th className="text-end">Total</th>
+                                                <th className="text-end">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {items.map((item, index) => {
+                                                const product = products.find(p => p.id === item.productId);
+                                                return (
+                                                    <tr key={index}>
+                                                        <td>{product ? getProductDisplayText(product) : item.name}</td>
+                                                        <td>{item.description}</td>
+                                                        <td className="text-center">{item.quantity}</td>
+                                                        <td className="text-end">{item.unitPrice.toFixed(2)}</td>
+                                                        <td className="text-end fw-bold">{item.totalPrice.toFixed(2)}</td>
+                                                        <td className="text-end">
+                                                            <button
+                                                                className="btn btn-sm btn-outline-danger"
+                                                                onClick={() => handleRemoveItem(index)}
+                                                            >
+                                                                <i className="bi bi-trash"></i>
+                                                            </button>
+                                                        </td>
+                                                    </tr>
+                                                );
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            )}
+                        </div>
+
+                        <div className="row mt-4">
+                            <div className="col-md-6 ms-auto">
+                                <div className="card bg-light border-0">
+                                    <div className="card-body">
+                                        <div className="d-flex justify-content-between mb-2">
+                                            <span className="text-muted">Subtotal (Ex VAT):</span>
+                                            <span className="fw-bold">{form.totalAmountExVat.toFixed(2)} {form.currencyCode}</span>
+                                        </div>
+                                        <div className="d-flex justify-content-between mb-2">
+                                            <span className="text-muted">VAT:</span>
+                                            <span className="fw-bold">{form.vatAmount.toFixed(2)} {form.currencyCode}</span>
+                                        </div>
+                                        <hr />
+                                        <div className="d-flex justify-content-between align-items-center">
+                                            <span className="h6 mb-0 fw-bold">Total Amount:</span>
+                                            <span className="h5 mb-0 fw-bold text-primary">{form.totalAmountIncVat.toFixed(2)} {form.currencyCode}</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {items.length > 0 && (
-                            <table className="table table-sm mt-3">
-                                <thead>
-                                    <tr>
-                                        <th>Product</th>
-                                        <th>Description</th>
-                                        <th>Qty</th>
-                                        <th>Unit Price</th>
-                                        <th>Total</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {items.map((item, index) => (
-                                        <tr key={index}>
-                                            <td>{item.name}</td>
-                                            <td>{item.description}</td>
-                                            <td>{item.quantity}</td>
-                                            <td>{item.unitPrice.toFixed(2)}</td>
-                                            <td>{item.totalPrice.toFixed(2)}</td>
-                                            <td>
-                                                <button
-                                                    className="btn btn-sm btn-outline-danger"
-                                                    onClick={() => handleRemoveItem(index)}
-                                                >
-                                                    ✕
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                            </table>
-                        )}
-
-                        <div className="text-end mt-3 p-3 bg-light rounded">
-                            <div>
-                                Ex VAT:{" "}
-                                <strong>
-                                    {form.totalAmountExVat.toFixed(2)} {form.currencyCode}
-                                </strong>
-                            </div>
-                            <div>
-                                VAT:{" "}
-                                <strong>
-                                    {form.vatAmount.toFixed(2)} {form.currencyCode}
-                                </strong>
-                            </div>
-                            <div className="fs-5">
-                                Total:{" "}
-                                <strong>
-                                    {form.totalAmountIncVat.toFixed(2)} {form.currencyCode}
-                                </strong>
-                            </div>
+                        <div className="mt-4 pt-3 border-top">
+                            <button
+                                className="btn btn-primary btn-lg w-100 fw-bold"
+                                onClick={handleCreateInvoice}
+                            >
+                                <i className="bi bi-check2-circle me-2"></i>Create Invoice
+                            </button>
                         </div>
-
-                        <button
-                            className="btn btn-primary mt-3 w-100"
-                            onClick={handleCreateInvoice}
-                        >
-                            Create Invoice
-                        </button>
                     </div>
                 </div>
             </div>
@@ -464,54 +483,62 @@ function Invoices({ view }) {
 
     return (
         <div>
-            <h4>Invoices</h4>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="fw-bold mb-0">List of Invoices</h4>
+                <button className="btn btn-primary" onClick={() => (window.location.hash = "#/invoices/add")}>
+                    <i className="bi bi-plus-lg me-2"></i>New Invoice
+                </button>
+            </div>
             {error && <div className="alert alert-danger">{error}</div>}
-            <div className="table-responsive rounded overflow-hidden">
-                <table className="table table-hover table-sm table-striped table-light mb-0">
-                    <thead className="table-secondary">
-                        <tr>
-                            <th>Invoice ID</th>
-                            <th>Customer</th>
-                            <th>Issue Date</th>
-                            <th>Total</th>
-                            <th>Status</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {invoices.map((invoice) => (
-                            <tr key={invoice.id}>
-                                <td>#{invoice.id}</td>
-                                <td>{invoice.customer?.name || "Unknown"}</td>
-                                <td>{new Date(invoice.issueDate).toLocaleDateString()}</td>
-                                <td>
-                                    {invoice.totalAmountIncVat.toFixed(2)} {invoice.currencyCode}
-                                </td>
-                                <td>
-                                    <span
-                                        className={`badge rounded-pill ${changeStatusColor(invoice.status)}`}
-                                    >
-                                        {invoice.status}
-                                    </span>
-                                </td>
-                                <td>
-                                    <button
-                                        className="btn btn-sm btn-info text-white"
-                                        onClick={() => handleOpenInvoice(invoice.id)}
-                                    >
-                                        View
-                                    </button>
-                                    <button
-                                        className="btn btn-sm btn-danger ms-2"
-                                        onClick={() => handleDeleteInvoice(invoice.id)}
-                                    >
-                                        Delete
-                                    </button>
-                                </td>
+            <div className="card border-0 shadow-sm overflow-hidden">
+                <div className="table-responsive">
+                    <table className="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>Invoice ID</th>
+                                <th>Customer</th>
+                                <th>Issue Date</th>
+                                <th>Total Amount</th>
+                                <th>Status</th>
+                                <th className="text-end">Actions</th>
                             </tr>
-                        ))}
-                    </tbody>
-                </table>
+                        </thead>
+                        <tbody>
+                            {invoices.map((invoice) => (
+                                <tr key={invoice.id}>
+                                    <td className="fw-bold text-dark">#{invoice.id}</td>
+                                    <td>
+                                        <div className="fw-bold text-dark">{invoice.customer?.name || "Unknown"}</div>
+                                        <div className="text-muted small">{invoice.customer?.city}</div>
+                                    </td>
+                                    <td>{new Date(invoice.issueDate).toLocaleDateString()}</td>
+                                    <td className="fw-bold text-dark">
+                                        {invoice.totalAmountIncVat.toFixed(2)} {invoice.currencyCode}
+                                    </td>
+                                    <td>
+                                        <span className={`badge ${getStatusBadgeClass(invoice.status)}`}>
+                                            {invoice.status}
+                                        </span>
+                                    </td>
+                                    <td className="text-end">
+                                        <button
+                                            className="btn btn-sm btn-outline-primary me-2"
+                                            onClick={() => handleOpenInvoice(invoice.id)}
+                                        >
+                                            <i className="bi bi-eye"></i>
+                                        </button>
+                                        <button
+                                            className="btn btn-sm btn-outline-danger"
+                                            onClick={() => handleDeleteInvoice(invoice.id)}
+                                        >
+                                            <i className="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
             </div>
 
             {showModal && selectedInvoice && (
@@ -592,22 +619,20 @@ function Invoices({ view }) {
                                 </div>
 
                                 <div className="mt-3">
-                                    <span
-                                        className={`badge rounded-pill ${changeStatusColor(selectedInvoice.status)}`}
-                                    >
+                                    <span className={`badge ${getStatusBadgeClass(selectedInvoice.status)}`}>
                                         {selectedInvoice.status}
                                     </span>
                                 </div>
                             </div>
                             <div className="modal-footer">
                                 <button
-                                    className="btn btn-secondary"
+                                    className="btn btn-primary"
                                     onClick={handleChangeStatus}
                                 >
-                                    Change Status
+                                    <i className="bi bi-arrow-repeat me-2"></i>Change Status
                                 </button>
                                 <button
-                                    className="btn btn-outline-dark"
+                                    className="btn btn-outline-secondary"
                                     onClick={() => setShowModal(false)}
                                 >
                                     Close

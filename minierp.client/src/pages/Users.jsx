@@ -48,33 +48,44 @@ function Users({ view }) {
     );
 
     const renderAdd = () => (
-        <div className="card shadow-sm border-0 rounded-3" style={{ maxWidth: '600px' }}>
-            <div className="card-header bg-white py-3 border-bottom">
-                <h5 className="mb-0 fw-bold">Přidat uživatele</h5>
+        <div>
+            <div className="d-flex justify-content-between align-items-center mb-4">
+                <h4 className="fw-bold mb-0">Nový uživatel</h4>
+                <button className="btn btn-outline-secondary" onClick={() => (window.location.hash = "#/users")}>
+                    <i className="bi bi-arrow-left me-2"></i>Zpět na seznam
+                </button>
             </div>
-            <div className="card-body p-4">
-                <form>
-                    <div className="mb-3">
-                        <label className="form-label">Uživatelské jméno</label>
-                        <input type="text" className="form-control" placeholder="admin123" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Heslo</label>
-                        <input type="password" className="form-control" />
-                    </div>
-                    <div className="mb-3">
-                        <label className="form-label">Role</label>
-                        <select className="form-select">
-                            <option value="User">User</option>
-                            <option value="Demo">Demo</option>
-                            <option value="Admin">Admin</option>
-                        </select>
-                    </div>
-                    <div className="d-flex justify-content-end gap-2">
-                        <button type="button" className="btn btn-light">Zrušit</button>
-                        <button type="submit" className="btn btn-primary">Uložit uživatele</button>
-                    </div>
-                </form>
+            <div className="card border-0 shadow-sm rounded-3" style={{ maxWidth: '600px' }}>
+                <div className="card-body p-4">
+                    <form>
+                        <div className="mb-3">
+                            <label className="form-label small fw-bold text-uppercase text-muted">Uživatelské jméno</label>
+                            <div className="input-group">
+                                <span className="input-group-text bg-white"><i className="bi bi-person text-muted"></i></span>
+                                <input type="text" className="form-control" placeholder="admin123" />
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <label className="form-label small fw-bold text-uppercase text-muted">Heslo</label>
+                            <div className="input-group">
+                                <span className="input-group-text bg-white"><i className="bi bi-key text-muted"></i></span>
+                                <input type="password" className="form-control" />
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <label className="form-label small fw-bold text-uppercase text-muted">Role</label>
+                            <select className="form-select">
+                                <option value="User">User</option>
+                                <option value="Demo">Demo</option>
+                                <option value="Admin">Admin</option>
+                            </select>
+                        </div>
+                        <div className="d-flex justify-content-end gap-2 pt-3 border-top">
+                            <button type="button" className="btn btn-light px-4" onClick={() => (window.location.hash = "#/users")}>Zrušit</button>
+                            <button type="submit" className="btn btn-primary px-4 fw-bold">Uložit uživatele</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
     );
