@@ -1,7 +1,7 @@
 <Solution>
+  <Project Path="MiniERP.Server/MiniERP.Server.csproj" />
   <Project Path="minierp.client/minierp.client.esproj">
     <Build />
     <Deploy />
   </Project>
-  <Project Path="MiniERP.Server/MiniERP.Server.csproj" />
 </Solution>

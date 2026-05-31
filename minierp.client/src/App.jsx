@@ -5,24 +5,43 @@ import Customers from './pages/Customers';
 import Products from './pages/Products';
 import Orders from './pages/Orders';
 import Invoices from './pages/Invoices';
+import Users from './pages/Users';
+import Login from './pages/Login';
 
 function App() {
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [user, setUser] = useState(null);
     const [activePage, setActivePage] = useState('Customer list');
+
+    const handleLogin = (userData) => {
+        setUser(userData);
+        setIsAuthenticated(true);
+    };
+
+    const handleLogout = () => {
+        // Volitelně můžeme zavolat API, ale pro demo stačí vymazat stav
+        fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+        setUser(null);
+        setIsAuthenticated(false);
+    };
+
     const [products, setProducts] = useState([]);
     const [productsLoading, setProductsLoading] = useState(true);
 
     useEffect(() => {
-        getProducts()
-            .then(data => {
-                setProducts(data);
-            })
-            .catch(() => {
-                setProducts([]);
-            })
-            .finally(() => {
-                setProductsLoading(false);
-            });
-    }, []);
+        if (isAuthenticated) {
+            getProducts()
+                .then(data => {
+                    setProducts(data);
+                })
+                .catch(() => {
+                    setProducts([]);
+                })
+                .finally(() => {
+                    setProductsLoading(false);
+                });
+        }
+    }, [isAuthenticated]);
 
     const renderPage = () => {
         switch (activePage) {
@@ -34,12 +53,18 @@ function App() {
             case 'Add order': return <Orders view="add" products={products} setProducts={setProducts} />;
             case 'Invoice list': return <Invoices view="list" />;
             case 'Add invoice': return <Invoices view="add" />;
+            case 'User list': return user?.role === 'Admin' ? <Users view="list" /> : null;
+            case 'Add user': return user?.role === 'Admin' ? <Users view="add" /> : null;
             default: return null;
         }
     };
 
+    if (!isAuthenticated) {
+        return <Login onLogin={handleLogin} />;
+    }
+
     return (
-        <Layout activePage={activePage} setActivePage={setActivePage}>
+        <Layout activePage={activePage} setActivePage={setActivePage} user={user} onLogout={handleLogout}>
             <div className="animate-slide-in">
                 {renderPage()}
             </div>

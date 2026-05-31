@@ -1,7 +1,7 @@
 import { useState } from "react";
 import "bootstrap-icons/font/bootstrap-icons.min.css";
 
-function Sidebar({ activePage, setActivePage }) {
+function Sidebar({ activePage, setActivePage, user }) {
   const [openSection, setOpenSection] = useState("");
 
   const menu = [
@@ -21,6 +21,11 @@ function Sidebar({ activePage, setActivePage }) {
       icon: "bi bi-receipt",
       items: ["Invoice list", "Add invoice"],
     },
+    ...(user?.role === 'Admin' ? [{
+      label: "Users",
+      icon: "bi bi-person-gear",
+      items: ["User list", "Add user"],
+    }] : []),
   ];
 
   return (

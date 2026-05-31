@@ -1,5 +1,7 @@
+using MiniERP.Server.Models;
 using MiniERP.Server.Data;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 namespace MiniERP.Server;
 
@@ -10,6 +12,15 @@ public class Program {
         var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
         builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
+        builder.Services.AddIdentity<User, IdentityRole>(options => {
+            options.Password.RequireDigit = false;
+            options.Password.RequiredLength = 4;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+        })
+        .AddEntityFrameworkStores<AppDbContext>()
+        .AddDefaultTokenProviders();
 
         builder.Services.AddCors(options => {
             options.AddPolicy("AllowReact", policy => {
@@ -28,6 +39,14 @@ public class Program {
         builder.Services.AddOpenApi();
 
         var app = builder.Build();
+
+        using (var scope = app.Services.CreateScope()) {
+            var userManager = scope.ServiceProvider.GetRequiredService<UserManager<User>>();
+            var context = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+            
+            context.Database.EnsureCreated();
+
+        }
 
         app.UseDefaultFiles();
         app.UseStaticFiles();
